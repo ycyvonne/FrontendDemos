@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Speech Recognition</title>
+
+	<link rel="stylesheet" type="text/css" href="style/style.css" />
+</head>
+<body>
+	<style>
+    html {
+      font-size: 10px;
+    }
+
+    body {
+      background: #f0f0f0;
+      font-family: 'helvetica neue';
+      font-weight: 200;
+      font-size: 20px;
+    }
+
+    p{
+    	margin: 0 !important;
+    }
+
+    .notice{
+    	text-align: center;
+    	font-size: 30px !important;
+    }
+
+    .notice, .words{
+    	width:500px;
+      	margin:50px auto;
+      	background:white;
+      	border-radius:5px;
+      	padding:10px;
+    }
+
+    .words {
+      background-size: 100% 3rem;
+      position: relative;
+      line-height:3rem;
+      min-height: 30px;
+    }
+
+    p {
+      margin: 0 0 3rem 0;
+    }
+
+  </style>
+</head>
+<body>
+	<div class="notice">
+		<p>Try talking!</p>
+	</div>
+	<div class="words" contenteditable>
+	</div>
+
+<script>
+
+//http-server -c-1 -a localhost -p 8000
+
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = new SpeechRecognition();
+recognition.interimResults = true;
+
+let p = document.createElement('p');
+const words = document.querySelector('.words');
+words.appendChild(p);
+
+recognition.addEventListener('result', e => {
+
+	const transcript = Array.from(e.results)
+		.map(result => result[0])
+		.map(result => {
+			return {
+				text: result.transcript,
+				confidence: result.confidence
+			}
+		})[0];
+
+	p.textContent = transcript.text;
+
+	if(e.results[0].isFinal){
+		p = document.createElement('p');
+		words.appendChild(p);
+	}
+
+});
+
+recognition.addEventListener('end', recognition.start);
+
+recognition.start();
+</script>
+</body>
+</html>
